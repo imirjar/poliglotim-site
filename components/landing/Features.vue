@@ -22,8 +22,6 @@ const features = [
 </script>
 
 <template>
- 
-
   <div class="grid md:grid-cols-3 gap-10 mx-auto max-w-screen-lg mt-12">
     <div v-for="item of features" class="flex gap-4 items-start">
       <div class="mt-1 bg-black rounded-full p-2 w-8 h-8 shrink-0">

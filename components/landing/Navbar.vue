@@ -1,24 +1,48 @@
-<script setup>
-const menuitems = [
-  // {
-  //   title: "Features",
-  //   path: "#",
-  // },
-  {
-    title: "Обучение",
-    path: "/study",
-  },
-  {
-    title: "Магазин",
-    path: "/shop",
-  },
-  {
-    title: "Путешествия",
-    path: "/travel",
-  },
-];
+<script setup lang="ts">
 
-const open = ref(false);
+  const  data  = ref(await useFetch('/api/check-auth'));
+  import { ref } from 'vue'
+
+    const isUserMenuOpen = ref(false)
+    
+    const toggleUserMenu = () => {
+        console.log("toggle")
+        isUserMenuOpen.value = !isUserMenuOpen.value // Переключаем состояние
+    }
+
+    const closeUserMenu = () => {
+        isUserMenuOpen.value = false // Просто закрываем меню
+    }
+
+    const signOut = async () => {
+        try {
+            await $fetch('/api/auth/signout', { method: 'POST' })
+            navigateTo('/')
+        } catch (error) {
+            console.error('Ошибка при выходе:', error)
+        }
+    }
+
+  const menuitems = [
+    // {
+    //   title: "Features",
+    //   path: "#",
+    // },
+    {
+      title: "Обучение",
+      path: "/study",
+    },
+    {
+      title: "Магазин",
+      path: "/shop",
+    },
+    {
+      title: "Путешествия",
+      path: "/travel",
+    },
+  ];
+
+  const open = ref(false);
 </script>
 
 <template>
@@ -36,7 +60,7 @@ const open = ref(false);
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <title>Menu</title>
+              <title>Меню</title>
               <path
                 v-show="open"
                 fill-rule="evenodd"
@@ -64,21 +88,82 @@ const open = ref(false);
             >
               {{ item.title }}
             </a>
+            
+          </li>
+          <li>
+            <a
+              href="/dashboard"
+              class="flex lg:px-3 py-2 text-gray-600 hover:text-gray-900"
+            >
+              Личный кабинет
+            </a>
           </li>
         </ul>
         <div class="lg:hidden flex items-center mt-3 gap-4">
-          <LandingLink href="#" styleName="muted" block size="md"
-            >Войти</LandingLink
-          >
-          <LandingLink href="#" size="md" block>Регистрация</LandingLink>
+          <LandingLink v-if="!data.data?.isAuthenticated" href="/dashboard" size="md" block>Войти</LandingLink>
+          <LandingLink v-else href="/logout" styleName="muted" block size="md">Выйти</LandingLink>
         </div>
       </nav>
       <div>
         <div class="hidden lg:flex items-center gap-4">
-          <a href="#">Войти</a>
-          <LandingLink href="#" size="md">Регистрация</LandingLink>
+          <!-- <a href="#">Войти</a> -->
+          <LandingLink v-if="!data.data?.isAuthenticated" href="/dashboard" size="md">Войти</LandingLink>
+          <div v-else class="relative">
+            <button 
+              v-on:click="toggleUserMenu"
+              class="flex items-center gap-2 focus:outline-none"
+            >
+                <img 
+                src="~/assets/img/chineese-girl-questions.svg"
+                alt="User Avatar"
+                class="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm"
+                >
+                <span class="text-gray-700 font-medium">Иван Петров</span>
+            </button>
+            
+            <!-- Выпадающее меню -->
+            <div 
+              v-if="isUserMenuOpen"
+              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+              v-click-outside="closeUserMenu"
+            >
+              <a 
+                href="/dashboard"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Личный кабинет
+                </div>
+              </a>
+              <button
+                @click="signOut"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Выйти
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </header>
   </LandingContainer>
 </template>
+
+<style>
+  /* Анимация для выпадающего меню */
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .fade-enter-from, .fade-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+</style>

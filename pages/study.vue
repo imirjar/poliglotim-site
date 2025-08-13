@@ -76,7 +76,7 @@ const pricing = [
     <LandingFeatures></LandingFeatures>
   
     
-    
-    <LandingContactform />
+   
+    <!--  <LandingContactform /> -->
     </LandingContainer>
 </template>

@@ -32,5 +32,16 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
       ],
     },
+  },
+
+  runtimeConfig: {
+    // Приватные ключи (только на сервере)
+    // apiSecret: '123',
+    
+    // Публичные ключи (доступны и на клиенте)
+    public: {
+      apiBaseUrl: process.env.AUTH_API || 'http://auth.redbeaver.ru'
+    }
   }
+  
 });
