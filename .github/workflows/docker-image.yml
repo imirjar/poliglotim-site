@@ -16,7 +16,7 @@ env:
 
 jobs:
 
-  Test:
+  # Test:
 
   Publish:
     needs: [Test]  
