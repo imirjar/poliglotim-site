@@ -31,10 +31,13 @@ jobs:
         files: ./dist/**  # Путь к сгенерированным статическим файлам
 
     - name: Upload Release Assets
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
-        name: nuxt-static-site
-        path: ./dist
+        files: poliglotim-site-${{ github.ref_name }}.zip
+        name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
 
 
 
