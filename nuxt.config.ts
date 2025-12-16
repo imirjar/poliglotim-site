@@ -23,6 +23,8 @@ export default defineNuxtConfig({
   },
   modules: ["nuxt-icon", "@nuxt/image"],
   app: {
+    baseURL: '/poliglotim-site/', // Важно: убедитесь, что здесь верное имя
+    buildAssetsDir: 'assets', // Изменяем стандартный '_nuxt' на 'assets'
     head: {
       title: 'Полиглотствуем', // Заголовок вкладки
       meta: [
