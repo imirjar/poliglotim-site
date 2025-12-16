@@ -1,57 +1,79 @@
-name: Build and Release
+name: Deploy to GitHub Pages
+# Название workflow, отображается в интерфейсе GitHub Actions
 
 on:
+  # Триггеры для запуска workflow:
   push:
-    tags: ['v*']
+    # Запуск при push в указанные ветки:
+    branches: [ main, master ]
   workflow_dispatch:
+    # Разрешает ручной запуск workflow из интерфейса GitHub
 
+# Настройка разрешений для GitHub Pages:
+permissions:
+  contents: read     # Чтение содержимого репозитория
+  pages: write       # Запись в GitHub Pages
+  id-token: write    # Для аутентификации при деплое
+
+# Управление параллельными запусками:
+concurrency:
+  group: "pages"            # Группа для управления конкурентностью
+  cancel-in-progress: false # Не отменять текущие запуски при новом
+
+# Определение jobs (задач):
 jobs:
   build:
+    # Job для сборки проекта
+    runs-on: ubuntu-latest  # Запуск на последней версии Ubuntu
+    steps:                  # Последовательность шагов выполнения
+
+      # Шаг 1: Получение кода из репозитория
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Полная история коммитов (нужна для некоторых плагинов)
+
+      # Шаг 2: Настройка Node.js среды
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'  # Версия Node.js (совместима с Nuxt 3)
+          cache: 'npm'        # Кэширование npm-зависимостей для ускорения
+
+      # Шаг 3: Установка зависимостей
+      - name: Install dependencies
+        run: npm ci  # Чистая установка зависимостей из package-lock.json
+
+      # Шаг 4: Генерация статического сайта
+      - name: Generate static site
+        run: npm run generate  # Запуск команды generate из package.json
+        # Команда generate создает статическую сборку в папке dist/
+
+      # Шаг 5: Настройка GitHub Pages
+      - name: Configure Pages
+        uses: actions/configure-pages@v4
+        # Подготавливает окружение для работы с GitHub Pages
+
+      # Шаг 6: Загрузка артефакта сборки
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'  # Папка со сгенерированным статическим сайтом
+          # Артефакт будет использован в job "deploy"
+
+  deploy:
+    # Job для публикации на GitHub Pages
     runs-on: ubuntu-latest
+    needs: build  # Зависит от успешного выполнения job "build"
+    
+    # Настройка окружения GitHub Pages:
+    environment:
+      name: github-pages    # Название окружения
+      url: ${{ steps.deployment.outputs.page_url }}  # URL после деплоя
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '24'  # Укажите версию Node.js, которую вы используете
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Build Nuxt.js static site
-      run: npm run generate  # Выполняет сборку статического сайта
-
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: ./dist/**  # Путь к сгенерированным статическим файлам
-
-    - name: Upload Release Assets
-      uses: actions/upload-artifact@v4
-      with:
-        files: poliglotim-site-${{ github.ref_name }}.zip
-        name: Release ${{ github.ref_name }}
-        draft: false
-        prerelease: false
-        generate_release_notes: true
-
-
-
-    # - name: Create .zip archive
-    #   run: |
-    #     cd dist
-    #     zip -r ../nuxt-app-${{ github.ref_name }}.zip .
-    #     cd ..
-
-    # - name: Create GitHub Release
-    #   uses: softprops/action-gh-release@v1
-    #   with:
-    #     files: nuxt-app-${{ github.ref_name }}.zip
-    #     name: Release ${{ github.ref_name }}
-    #     draft: false
-    #     prerelease: false
-    #     generate_release_notes: true
+      # Единственный шаг: деплой на GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment  # Идентификатор для получения outputs
+        uses: actions/deploy-pages@v4
+        # Автоматически публикует артефакт из предыдущего job
