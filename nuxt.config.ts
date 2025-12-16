@@ -3,14 +3,15 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-08-02',
   ssr: false,
   nitro: {
-    prerender: {
-      routes: [
-        '/_ipx/s_480x560/img/shop/murphy.png',
-        '/_ipx/s_580x580/img/shop/chinese.png',
-        '/_ipx/s_580x580/img/shop/french.png',
-        // etc.
-      ]
-    }
+    // prerender: {
+    //   routes: [
+    //     '/_ipx/s_480x560/img/shop/murphy.png',
+    //     '/_ipx/s_580x580/img/shop/chinese.png',
+    //     '/_ipx/s_580x580/img/shop/french.png',
+    //     // etc.
+    //   ]
+    // }
+     preset: 'github-pages' // Специальный пресет для GitHub Pages
   },
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
@@ -33,15 +34,5 @@ export default defineNuxtConfig({
       ],
     },
   },
-
-  runtimeConfig: {
-    // Приватные ключи (только на сервере)
-    // apiSecret: '123',
-    
-    // Публичные ключи (доступны и на клиенте)
-    public: {
-      apiBaseUrl: process.env.AUTH_API || 'http://auth.redbeaver.ru'
-    }
-  }
   
 });
