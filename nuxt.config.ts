@@ -2,17 +2,6 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-08-02',
   ssr: false,
-  nitro: {
-    // prerender: {
-    //   routes: [
-    //     '/_ipx/s_480x560/img/shop/murphy.png',
-    //     '/_ipx/s_580x580/img/shop/chinese.png',
-    //     '/_ipx/s_580x580/img/shop/french.png',
-    //     // etc.
-    //   ]
-    // }
-     preset: 'github-pages' // Специальный пресет для GitHub Pages
-  },
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
   postcss: {
@@ -23,7 +12,7 @@ export default defineNuxtConfig({
   },
   modules: ["nuxt-icon", "@nuxt/image"],
   app: {
-    baseURL: '/poliglotim-site/', // Важно: убедитесь, что здесь верное имя
+    baseURL: '/',
     buildAssetsDir: 'assets', // Изменяем стандартный '_nuxt' на 'assets'
     head: {
       title: 'Полиглотствуем', // Заголовок вкладки
